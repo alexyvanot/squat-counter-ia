@@ -1,31 +1,27 @@
 import streamlit as st
 import cv2
-import mediapipe as mp
 import numpy as np
-import time
 
+from libs.pose_init import get_pose_objects
+from libs.camera import init_camera
+from libs.timer_utils import FPSTimer
 from libs.pose_processing import extract_landmarks, compute_angles_and_hip_y
 from libs.squat_logic import update_squat_state
 from libs.drawing_utils import draw_overlay, draw_gauge
-from libs.console_output import log_pose_debug, log_squat_started, log_squat_validated
+from libs.con_output import log_pose_debug, log_squat_started, log_squat_validated
 
 st.set_page_config(page_title="Squat Counter", layout="centered")
 st.title("🏋️ Squat Counter")
 
-mp_pose = mp.solutions.pose
-pose = mp_pose.Pose()
-mp_drawing = mp.solutions.drawing_utils
-
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+mp_pose, pose, mp_drawing = get_pose_objects()
+cap = init_camera()
+fps_timer = FPSTimer()
 
 counter = 0
 en_squat = False
 current_position = "STANDING"
 
 stframe = st.empty()
-prev_time = time.time()
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -52,9 +48,7 @@ while cap.isOpened():
         elif validated:
             log_squat_started()
 
-        curr_time = time.time()
-        fps = 1 / (curr_time - prev_time)
-        prev_time = curr_time
+        fps = fps_timer.update()
 
         draw_overlay(
             image, (right_angle, left_angle), hip_y, counter, current_position, fps

@@ -1,4 +1,5 @@
-from libs.config import SQUAT_THRESHOLD, STAND_THRESHOLD, SQUAT_HIP_MIN, STAND_HIP_MAX
+from ..init.app_init import SQUAT_THRESHOLD, STAND_THRESHOLD, SQUAT_HIP_MIN, STAND_HIP_MAX
+
 
 def update_squat_state(right_angle, left_angle, hip_y, en_squat):
     if (

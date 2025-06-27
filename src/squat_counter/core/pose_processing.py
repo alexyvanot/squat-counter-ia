@@ -1,5 +1,5 @@
 import mediapipe as mp
-from libs.squat_utils import calculate_angle
+from ..core.squat_utils import calculate_angle
 
 mp_pose = mp.solutions.pose
 

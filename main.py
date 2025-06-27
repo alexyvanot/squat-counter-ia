@@ -2,13 +2,13 @@ import streamlit as st
 import cv2
 import numpy as np
 
-from libs.pose_init import get_pose_objects
-from libs.camera import init_camera
-from libs.timer_utils import FPSTimer
-from libs.pose_processing import extract_landmarks, compute_angles_and_hip_y
-from libs.squat_logic import update_squat_state
-from libs.drawing_utils import draw_overlay, draw_gauge
-from libs.con_output import log_pose_debug, log_squat_started, log_squat_validated
+from src.squat_counter.init.pose_init import get_pose_objects
+from src.squat_counter.io.camera import init_camera
+from src.squat_counter.core.timer_utils import FPSTimer
+from src.squat_counter.core.pose_processing import extract_landmarks, compute_angles_and_hip_y
+from src.squat_counter.core.squat_logic import update_squat_state
+from src.squat_counter.io.drawing_utils import draw_overlay, draw_gauge
+from src.squat_counter.io.console import log_pose_debug, log_squat_started, log_squat_validated
 
 st.set_page_config(page_title="Squat Counter", layout="centered")
 st.title("🏋️ Squat Counter")

@@ -2,13 +2,12 @@ import streamlit as st
 import cv2
 import mediapipe as mp
 import numpy as np
-import sys
 import time
 
 from libs.pose_processing import extract_landmarks, compute_angles_and_hip_y
-from libs.squat_utils import calculate_angle
 from libs.squat_logic import update_squat_state
 from libs.drawing_utils import draw_overlay, draw_gauge
+from libs.console_output import log_pose_debug, log_squat_started, log_squat_validated
 
 st.set_page_config(page_title="Squat Counter", layout="centered")
 st.title("🏋️ Squat Counter")
@@ -42,20 +41,16 @@ while cap.isOpened():
         lm_dict = extract_landmarks(results.pose_landmarks.landmark)
         right_angle, left_angle, hip_y = compute_angles_and_hip_y(lm_dict)
 
-        angle = min(right_angle, left_angle)
-        sys.stdout.write(
-            f"\r[DEBUG] angles G:{int(left_angle)}° D:{int(right_angle)}° → min:{int(angle)}° | hip_y: {hip_y:.3f}        "
-        )
-        sys.stdout.flush()
+        log_pose_debug(right_angle, left_angle, hip_y)
 
         en_squat, current_position, validated = update_squat_state(
             right_angle, left_angle, hip_y, en_squat
         )
         if validated and current_position == "STANDING":
             counter += 1
-            print(f"\n[✅] Squat validated! Current total: {counter}")
+            log_squat_validated(counter)
         elif validated:
-            print("\n[⏬] Squat position detected (squat started)")
+            log_squat_started()
 
         curr_time = time.time()
         fps = 1 / (curr_time - prev_time)

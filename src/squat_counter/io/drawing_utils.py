@@ -1,5 +1,5 @@
 import cv2
-from ..init.app_init import SQUAT_HIP_MIN, STAND_HIP_MAX
+from ..init.config_init import SQUAT_HIP_MIN, STAND_HIP_MAX
 
 
 def draw_overlay(image, angles, hip_y, counter, position, fps):

@@ -5,6 +5,7 @@ import numpy as np
 import sys
 import time
 
+from libs.pose_processing import extract_landmarks, compute_angles_and_hip_y
 from libs.squat_utils import calculate_angle
 from libs.squat_logic import update_squat_state
 from libs.drawing_utils import draw_overlay, draw_gauge
@@ -38,43 +39,10 @@ while cap.isOpened():
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
     if results.pose_landmarks:
-        lm = results.pose_landmarks.landmark
-
-        right_angle = calculate_angle(
-            [
-                lm[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
-                lm[mp_pose.PoseLandmark.RIGHT_HIP.value].y,
-            ],
-            [
-                lm[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
-                lm[mp_pose.PoseLandmark.RIGHT_KNEE.value].y,
-            ],
-            [
-                lm[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x,
-                lm[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y,
-            ],
-        )
-        left_angle = calculate_angle(
-            [
-                lm[mp_pose.PoseLandmark.LEFT_HIP.value].x,
-                lm[mp_pose.PoseLandmark.LEFT_HIP.value].y,
-            ],
-            [
-                lm[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
-                lm[mp_pose.PoseLandmark.LEFT_KNEE.value].y,
-            ],
-            [
-                lm[mp_pose.PoseLandmark.LEFT_ANKLE.value].x,
-                lm[mp_pose.PoseLandmark.LEFT_ANKLE.value].y,
-            ],
-        )
+        lm_dict = extract_landmarks(results.pose_landmarks.landmark)
+        right_angle, left_angle, hip_y = compute_angles_and_hip_y(lm_dict)
 
         angle = min(right_angle, left_angle)
-        hip_y = (
-            lm[mp_pose.PoseLandmark.LEFT_HIP.value].y
-            + lm[mp_pose.PoseLandmark.RIGHT_HIP.value].y
-        ) / 2
-
         sys.stdout.write(
             f"\r[DEBUG] angles G:{int(left_angle)}° D:{int(right_angle)}° → min:{int(angle)}° | hip_y: {hip_y:.3f}        "
         )
